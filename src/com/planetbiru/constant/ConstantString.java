@@ -33,9 +33,6 @@ public class ConstantString {
 	public static final String MODEM_NOT_CONNECTED             = "Modem is not connected";
 	public static final String URL_ENCODE                      = "application/x-www-form-urlencoded";
 	public static final String UNAUTHORIZED                    = "Unauthorized";
-	public static final String BLOCK_MSISDN                    = "block-msisdn";
-	public static final String UNBLOCK_MSISDN                  = "unblock-msisdn";
-	public static final String SEND_SMS                        = "send-sms";
 	public static final String AUTHORIZATION                   = "Authorization";
 	public static final String ACCEPT                          = "Accept";
 	public static final String BEARER                          = "Bearer ";

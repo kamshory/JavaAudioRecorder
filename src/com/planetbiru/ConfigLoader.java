@@ -32,8 +32,7 @@ public class ConfigLoader {
 		{
 			try 
 			{
-				ConfigLoader.properties.load(inputStream);
-				
+				ConfigLoader.properties.load(inputStream);				
 				for (Entry<Object, Object> entry : ConfigLoader.properties.entrySet()) {
 				    String key = (String) entry.getKey();
 				    String keyEnv = key.toUpperCase().replace(".", "_");
