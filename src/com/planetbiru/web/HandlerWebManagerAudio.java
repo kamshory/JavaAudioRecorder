@@ -32,6 +32,16 @@ public class HandlerWebManagerAudio implements HttpHandler {
 			System.out.println("Stop recording");
 			SoundRecorder.stopRecording();
 		}
+		else if(path.contains("audio/recording/pause"))
+		{
+			System.out.println("Pause recording");
+			SoundRecorder.pauseRecording();
+		}
+		else if(path.contains("audio/recording/resume"))
+		{
+			System.out.println("Resume recording");
+			SoundRecorder.resumeRecording();
+		}
 		
 	}
 

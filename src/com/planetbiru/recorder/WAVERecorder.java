@@ -12,17 +12,11 @@ public class WAVERecorder extends Thread {
 
 	private AudioFormat audioFormat;
 	private String path;
-	private boolean running = true;
-
 	public WAVERecorder(String path, AudioFormat audioFormat) {
 		this.audioFormat = audioFormat;
 		this.path = path;
 	}
 
-	public void stopRecording() {
-		this.running = false;
-		
-	}
 	@Override
 	public void run()
 	{
@@ -57,25 +51,27 @@ public class WAVERecorder extends Thread {
 			byte[] byteToRead = new byte[256];
 			
 			int flag;
-			int size = 0;
+			int dataSize = 0;
 			int i = 0;
-			while((flag = targetDataLine.read(byteToRead, 0, byteToRead.length))>0 && this.running) 
+			while((flag = targetDataLine.read(byteToRead, 0, byteToRead.length))> 0 && SoundRecorder.isRecording()) 
 			{
-				//Collect data from the sound card
-				output.write(byteToRead);
-				size += flag;
-				
-				if(i % 10 == 0)
+
+				if(!SoundRecorder.isPaused())
 				{
-					writeInt(output, size + 36, 4);
-					writeInt(output, size, 40);
-					output.seek(output.length());
+					output.write(byteToRead);
+					dataSize += flag;				
+					if(i % 10 == 0)
+					{
+						writeInt(output, dataSize + 36, 4);
+						writeInt(output, dataSize, 40);
+						output.seek(output.length());
+					}	
+					SoundRecorder.setDataSize(dataSize);
+					i++;
 				}
-				
-				i++;
 			}			
-			writeInt(output, size + 36, 4);
-			writeInt(output, size, 40);
+			writeInt(output, dataSize + 36, 4);
+			writeInt(output, dataSize, 40);
 			targetDataLine.stop();
 			targetDataLine.close();
 		} 

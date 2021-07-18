@@ -1,19 +1,25 @@
 package com.planetbiru;
 
+import java.net.InetSocketAddress;
+
 import com.planetbiru.config.Config;
 import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.web.ServerWebAdmin;
+import com.planetbiru.web.ServerWebSocketServerAdmin;
 
 public class Application {
 	private static ServerWebAdmin server = new ServerWebAdmin();
-	
+	private static ServerWebSocketServerAdmin serverWS;
 	
 	
 	public static void main(String[] args)
 	{
 		WebUserAccount.load(Config.getUserSettingPath());
 		server.start(80);
+		InetSocketAddress address = new InetSocketAddress(8080);
+		serverWS = new ServerWebSocketServerAdmin(address); 
+		serverWS.start();
 	}
 	public static boolean loadConfig(String currentRootDirectoryPath, String fileName)
 	{

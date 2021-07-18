@@ -50,6 +50,12 @@ public class CookieServer {
 		this.updateSessionID();
 	}
 	
+	public CookieServer(String rawCookie, String sessionName, long sessionLifetime) {
+		this.sessionLifetime = sessionLifetime;
+		this.sessionName = sessionName;
+		this.parseCookie(rawCookie);
+		this.updateSessionID();
+	}
 	public CookieServer(String rawCookie)
 	{
 		this.parseCookie(rawCookie);
@@ -63,6 +69,8 @@ public class CookieServer {
 		this.updateSessionID();
 	}
 	
+	
+
 	private void updateSessionID() {
 		if(!this.cookieItem.containsKey(this.sessionName))
 		{
@@ -132,6 +140,8 @@ public class CookieServer {
 	}
 	private void parseCookie(List<String> rawCookies)
 	{
+		System.out.println("Web");
+		System.out.println("rawCookie : "+rawCookies);
 		URLCodec urlCodec = new URLCodec();
 		Map<String, CookieItem> list = new HashMap<>();
 		if(rawCookies != null)

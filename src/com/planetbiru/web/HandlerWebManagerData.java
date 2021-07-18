@@ -1,6 +1,7 @@
 package com.planetbiru.web;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 
@@ -375,17 +376,48 @@ public class HandlerWebManagerData implements HttpHandler {
 			{
 				String fullname = Config.getStorageDir() + "/" + path;
 				fullname = FileConfigUtil.fixFileName(fullname);	
-				byte[] list = "".getBytes();
-				try 
+				File file = new File(fullname);
+				if(file.exists())
 				{
-					list = FileUtil.readResource(fullname);
-					responseBody = list;
-					String contentType = HttpUtil.getMIMEType(path);
-					String baseName = HttpUtil.getBaseName(path);
-					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
-					responseHeaders.add("Content-disposition", "attachment; filename=\""+baseName+"\"");
-				} 
-				catch (FileNotFoundException e) 
+					try(FileInputStream fis = new FileInputStream(file))
+					{
+					
+						if(file.length() > 10240)
+						{
+							long fileLength = file.length();
+							httpExchange.sendResponseHeaders(statusCode, fileLength);
+							int length = 10240;
+							int offset = 0;
+							do
+							{
+								if(length < fileLength - offset)
+								{
+									length = (int) (fileLength - offset);
+								}
+								responseBody = new byte[(int) length];
+								if(fis.read(responseBody, offset, length) > 0);
+								{
+									httpExchange.getResponseBody().write(responseBody);
+								}
+								offset += length;
+							}
+							while((offset + length) < fileLength);
+						}
+						else
+						{
+							responseBody = new byte[(int) file.length()];
+							httpExchange.sendResponseHeaders(statusCode, file.length());	 
+							if(fis.read(responseBody) > 0)
+							{
+								httpExchange.getResponseBody().write(responseBody);
+							}
+						}
+					}
+					finally {
+						
+					}
+				}
+				else
 				{
 					statusCode = HttpStatus.NOT_FOUND;
 				}
@@ -403,10 +435,7 @@ public class HandlerWebManagerData implements HttpHandler {
 		}
 		cookie.saveSessionData();
 		cookie.putToHeaders(responseHeaders);
-		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 
-		httpExchange.sendResponseHeaders(statusCode, responseBody.length);	 
-		httpExchange.getResponseBody().write(responseBody);
 		httpExchange.close();	
 	}
 	

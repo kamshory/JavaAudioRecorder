@@ -8,6 +8,7 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import com.planetbiru.WebSocketConnection;
+import com.planetbiru.config.Config;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.user.NoUserRegisteredException;
@@ -41,13 +42,19 @@ public class ServerWebSocketServerAdmin extends WebSocketServer{
 	public void onOpen(WebSocket conn, ClientHandshake request) {
 		
 		String rawCookie = request.getFieldValue("Cookie");
+		System.out.println("WebSocket");
+		System.out.println("rawCookie : "+rawCookie);
 		CookieServer cookie = new CookieServer(rawCookie);
+		cookie = new CookieServer(rawCookie, Config.getSessionName(), Config.getSessionLifetime());
 		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
 		String password = cookie.getSessionData().optString(JsonKey.PASSWORD, "");
+		System.out.println("username : "+username);
+		System.out.println("password : "+password);
 		try 
 		{
 			if(WebUserAccount.checkUserAuth(username, password))
 			{
+				System.out.println("Client added");
 				ServerWebSocketServerAdmin.clients.add(new WebSocketConnection(conn, request));
 			}
 			else
@@ -61,6 +68,7 @@ public class ServerWebSocketServerAdmin extends WebSocketServer{
 		}
 	}
 	
+
 	@Override
 	public void onStart() {
 		/**

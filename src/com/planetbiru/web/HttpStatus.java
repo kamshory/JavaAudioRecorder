@@ -7,6 +7,7 @@ public class HttpStatus {
 	public static final int UNAUTHORIZED = 401;
 	public static final int NOT_FOUND = 404;
 	public static final int PERMANENT_REDIRECT = 301;
+	public static final int PARTIAL_CONTENT = 206;
 	
 	private HttpStatus()
 	{

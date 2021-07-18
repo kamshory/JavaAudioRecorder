@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="require-login" content="true" data-file="/login-form.html">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="lib.assets/css/bootstrap.css" rel="stylesheet">
+    <link href="lib.assets/css/style.min.css" rel="stylesheet">
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <script src="lib.assets/js/ie-emulation-modes-warning.js"></script>
+    <script src="lib.assets/js/ie10-viewport-bug-workaround.js"></script>    
+    <script src="lib.assets/js/jquery.min.js"></script>
+    <script src="lib.assets/js/bootstrap.js"></script>
+    <script src="lib.assets/js/ws.min.js"></script>
+    <link rel="stylesheet" href="lib.assets/css/filemanager.css">
+    <title>Audio Recordning</title>
+</head>
+<body>
+    <style>
+        .toolbar{
+            margin: 0;
+            padding: 0;
+        }
+        .toolbar .tool{
+            display: inline-block;
+            position: relative;
+        }
+        .toolbar .tool a{
+            width: 48px;
+            height: 48px;
+            display: block;
+            background-color: #F5f5F5;
+        }
+        .tool-record a::before{
+            content: "";
+            width: 24px;
+            height: 24px;
+            background-color: #ee0d0d;
+            border-radius: 50%;
+            left: calc(50% - 12px);
+            top: calc(50% - 12px);
+            position: absolute;
+
+        }
+        .tool-pause[data-status="normal"] a::before{
+            content: "";
+            width: 10px;
+            height: 24px;
+            background-color:#514b4b;
+            left: calc(50% - 12px);
+            top: calc(50% - 12px);
+            position: absolute;
+
+        }
+        .tool-pause[data-status="normal"] a::after{
+            content: "";
+            width: 10px;
+            height: 24px;
+            background-color:#514b4b;
+            right: calc(50% - 12px);
+            top: calc(50% - 12px);
+            position: absolute;
+
+        }
+        .tool-pause[data-status="paused"] a::before{
+            content: "";
+            width: 8px;
+            height: 24px;
+            background-color:#514b4b;
+            left: calc(50% - 12px);
+            top: calc(50% - 12px);
+            position: absolute;
+
+        }
+        .tool-pause[data-status="paused"] a::after{
+            content: "";
+            width: 0; 
+            height: 0; 
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;         
+            border-left: 12px solid #514b4b;
+            right: calc(50% - 12px);
+            top: calc(50% - 12px);
+            position: absolute;
+
+        }
+        .tool-stop a::before{
+            content: "";
+            width: 24px;
+            height: 24px;
+            background-color: #514b4b;
+            left: calc(50% - 12px);
+            top: calc(50% - 12px);
+            position: absolute;
+
+        }
+
+        .tool-play a::after{
+            content: "";
+            width: 0; 
+            height: 0; 
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;         
+            border-left: 18px solid #514b4b;
+            left: calc(50% - 9px);
+            top: calc(50% - 12px);
+            position: absolute;
+
+        }
+        .float-right{
+            float:right;
+        }
+        .float-right .dropdown-menu{
+            right: 0 !important; 
+            left: auto !important;
+        }
+        .statusbar{
+            background-color: #F5f5F5;
+            height: 48px;
+            width: calc(100% - 300px);
+            display: inline-block;
+        }
+        .recording-status{
+            display: block;
+            position: relative;
+        }
+        .recording-status-wrapper{
+            display: block;
+        }
+        .recording-status-wrapper > div{
+            height: 48px;
+            width: 80px;
+            display: inline-block; 
+            vertical-align: top;     
+            text-align: center;
+            padding-top: 14px;     
+        }
+        .toolbar{
+            float: left;
+            margin-right: 10px;
+        }
+
+    </style>
+    <div class="contaoner">
+
+        <div class="dropdown float-right">
+            <a href="#" class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Menu
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="setting.html">Preference</a></li>
+                <li><a class="dropdown-item" href="account.html">Account</a></li>
+                <li><a class="dropdown-item" href="admin.html">Administrator</a></li>
+                <li><a class="dropdown-item" href="#logout.html">Logout</a></li>
+            </ul>
+        </div>
+
+        <div class="tool">
+            <div class="toolbar">
+                <li class="tool tool-record"><a href="javascript:;"></a></li>
+                <li class="tool tool-pause" data-status="normal"><a href="javascript:;"></a></li>
+                <li class="tool tool-stop"><a href="javascript:;"></a></li>              
+            </div>
+            <div class="statusbar">
+                <div class="recording-status">
+                    <div class="recording-status-wrapper">
+                        <div class="recording-duration"></div>
+                        <div class="recording-size"></div>
+                    </div>                
+                </div>
+            </div>
+        </div>
+        <script>
+            function displaySize(size)
+            {
+                var ret = '';
+                size = size / 1024;
+                if(size > 1048576)
+                {
+                    ret = (size / 1048576).toFixed(2) + ' GB';
+                }
+                else if(size > 1024)
+                {
+                    ret = (size / 1024).toFixed(2) + ' MB';
+                }
+                else
+                {
+                    ret = size.toFixed(0) + ' kB';
+                }
+                return ret;
+            }
+            function degToDMS (deg) {
+                deg = deg / 3600000;
+                var d = Math.floor (deg);
+                var minfloat = (deg-d)*60;
+                var m = Math.floor(minfloat);
+                var secfloat = (minfloat-m)*60;
+                var s = Math.round(secfloat);
+                // After rounding, the seconds might become 60. These two
+                // if-tests are not necessary if no rounding is done.
+                if (s==60) {
+                    m++;
+                    s=0;
+                }
+                if (m==60) {
+                    d++;
+                    m=0;
+                }
+                if(d > 0)
+                {
+                    return [d, m, s].join(':');
+                }
+                else if(m > 0)
+                {
+                    return [m, s].join(':');
+                }
+                else
+                {
+                    return s;
+                }
+            }
+            function handleIncommingMessage(message)
+            {
+                var json = JSON.parse(message);
+                if(json.command == 'recording-status')
+                {
+                    $('.recording-duration').text(degToDMS(json.data.duration))
+                    $('.recording-size').text(displaySize(json.data.fileSize))
+                }
+                
+            }
+            $(document).on('click', '.tool .tool-record a', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                $.ajax({
+                    type:'POST',
+                    url:'audio/recording/start',
+                    data:{},
+                    dataType:'json',
+                    success:function(data){
+                        console.log(data);
+                    }
+                });
+                $('.tool .tool-pause').attr('data-status', 'normal')
+            });
+            $(document).on('click', '.tool .tool-pause[data-status="normal"] a', function(e){
+                
+                e.preventDefault();
+                e.stopPropagation();
+                $.ajax({
+                    type:'POST',
+                    url:'audio/recording/pause',
+                    data:{},
+                    dataType:'json',
+                    success:function(data){
+                        console.log(data);
+                    }
+                });
+                $('.tool .tool-pause').attr('data-status', 'paused')
+            });
+            $(document).on('click', '.tool .tool-pause[data-status="paused"] a', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                $.ajax({
+                    type:'POST',
+                    url:'audio/recording/resume',
+                    data:{},
+                    dataType:'json',
+                    success:function(data){
+                        console.log(data);
+                    }
+                });
+                $('.tool .tool-pause').attr('data-status', 'normal')
+            });
+            $(document).on('click', '.tool .tool-stop a', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                $.ajax({
+                    type:'POST',
+                    url:'audio/recording/stop',
+                    data:{},
+                    dataType:'json',
+                    success:function(data){
+                        console.log(data);
+                    }
+                });
+                $('.tool .tool-pause').attr('data-status', 'normal')
+            });
+        </script>
+        <div class="file-manager" data-source="data/recording/list">          
+            <form action="" method="post">
+                <div class="dir-select">
+                    <select class="input-select select-path">
+                    </select>
+                </div>
+                <div class="file-manager-body">
+                    <div class="dir">
+                        <ul class="parentdir"></ul>
+                    </div>
+                    <div class="file">
+                        <div class="file-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td width="16"><input type="checkbox" class="check-all"></td>
+                                        <td width="16"><span class="icon icon-dir"></span></td>
+                                        <td>Name</td>
+                                        <td width="50" align="right">Size</td>
+                                        <td width="160" class="file-modify">Modified</td>
+                                        <td width="50">Type</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+        </div>
+        <script src="lib.assets/js/filemanager.js"></script>
+
+    </div>
+</body>
+</html>

@@ -4,9 +4,9 @@ public class Config {
 	private static int serverPort = 80;
 	private static long sessionLifetime = 14400000;
 	private static String sessionName = "SESSID";
-	private static String baseDirConfig = "C:\\bitbucket\\JavaAudioRecorder\\resources\\data";
-	private static String documentRoot = "C:\\Users\\kamshory\\Desktop\\recording";
-	private static String sessionFilePath = "\\session";
+	private static String baseDirConfig = "C:/bitbucket/JavaAudioRecorder/resources/data";
+	private static String documentRoot = "C:/bitbucket/JavaAudioRecorder/resources/www";
+	private static String sessionFilePath = "/session";
 	private static boolean logConfigNotFound = false;
 	private static String dhcpSettingPath = "network/dhcp.json";
 	private static String logDir = "";
@@ -14,15 +14,14 @@ public class Config {
 	private static String cleanupCommand = "";
 	private static String osEthernetConfigPath = "";
 	private static String generalSettingPath = "setting/general.json";
-	private static String recordingPath = "C:\\bitbucket\\JavaAudioRecorder\\resources\\recording";
+	private static String recordingPath = "C:/bitbucket/JavaAudioRecorder/resources/recording";
 	private static String osDHCPConfigPath = "";
 	private static String wlanSettingPath = "/network/ethernet.json";
 	private static String osWLANConfigPath = "";
 	private static String osSSIDKey = "";
 	private static String ethernetSettingPath = "/network/ethernet.json";
-	private static String storageDir = "C:\\bitbucket\\JavaAudioRecorder\\resources\\recording";
-	private static String userSettingPath = "\\user\\user.json";
-	
+	private static String storageDir = "C:/bitbucket/JavaAudioRecorder/resources/recording";
+	private static String userSettingPath = "/user/user.json";	
 	
 	private static String imageName = "";
 	private static String  emailSettingPath = "";
