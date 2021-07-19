@@ -124,12 +124,11 @@ public class CookieItem {
 			String format = "EEE, dd MMM yyyy HH:mm:ss";
 			builder.append("; Expires="+Utility.date(format, this.expires, "UTC")+" GMT");
 		}
-		builder.append("; SameSite=None; Secure");
+		builder.append("; SameSite=Lax");
 		if(this.httpOnly)
 		{
 			builder.append("; HttpOnly");
 		}	
-		System.out.println(builder.toString());
 		return builder.toString();
 	}
 }

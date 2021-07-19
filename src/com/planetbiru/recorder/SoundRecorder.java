@@ -3,6 +3,8 @@ package com.planetbiru.recorder;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 
+import org.json.JSONObject;
+
 public class SoundRecorder {
 	
 	private static WAVERecorder recorder;
@@ -25,6 +27,7 @@ public class SoundRecorder {
 		paused = false;			
 		if(!recording)
 		{
+			recording = true;
 			int frameSize = (bitDepth / 8) * channel;
 			SoundRecorder.sampleRate = sampleRate;
 			SoundRecorder.bitDepth = bitDepth;
@@ -36,23 +39,37 @@ public class SoundRecorder {
 			Encoding audioFormatEncoding = Encoding.PCM_SIGNED;
 			boolean bigEndian = true;
 			AudioFormat audioFormat = new AudioFormat(audioFormatEncoding, sampleRate, bitDepth, channel, frameSize, sampleRate, bigEndian);
-			recording = true;
 			recorder = new WAVERecorder(path, audioFormat);
 			recorder.start();
 			broadcaster.start();
 		}
 	}
+	public static JSONObject getStatus()
+	{
+		JSONObject info = new JSONObject();
+		JSONObject data = new JSONObject();			
+		data.put("isRecording", SoundRecorder.isRecording());
+		data.put("isPaused", SoundRecorder.isPaused());
+		data.put("duration", SoundRecorder.getDuration());
+		data.put("fileSize", SoundRecorder.getDataSize());			
+		info.put("command", "recording-status");
+		info.put("data", data);
+		return info;
+	}
 	public static void pauseRecording()
 	{
+		recording = true;
 		paused = true;
 	}
 	public static void resumeRecording()
 	{
+		recording = true;
 		paused = false;
 	}
 	public static void stopRecording()
 	{
 		recording = false;
+		paused = false;
 	}
 	
 	public static long getDuration() {

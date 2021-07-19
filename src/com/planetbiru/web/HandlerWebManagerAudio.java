@@ -2,6 +2,8 @@ package com.planetbiru.web;
 
 import java.io.IOException;
 
+import org.json.JSONObject;
+
 import com.planetbiru.config.Config;
 import com.planetbiru.recorder.SoundRecorder;
 import com.planetbiru.util.Utility;
@@ -12,10 +14,8 @@ public class HandlerWebManagerAudio implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange httpExchange) throws IOException {
+		byte[] responseBody;
 		httpExchange.getResponseHeaders().add("Content-Type", "application/json");
-		httpExchange.sendResponseHeaders(200, 2);
-		httpExchange.getResponseBody().write("{}".getBytes());
-		httpExchange.close();
 		
 		String path = httpExchange.getRequestURI().getPath();
 		if(path.contains("audio/recording/start"))
@@ -26,6 +26,7 @@ public class HandlerWebManagerAudio implements HttpHandler {
 			short bitDepth = 16;
 			short channel = 2;
 			SoundRecorder.startRecording(audioPath, sampleRate, bitDepth, channel);
+			
 		}
 		else if(path.contains("audio/recording/stop"))
 		{
@@ -42,6 +43,15 @@ public class HandlerWebManagerAudio implements HttpHandler {
 			System.out.println("Resume recording");
 			SoundRecorder.resumeRecording();
 		}
+		else if(path.contains("audio/recording/status"))
+		{
+			System.out.println("Status recording");
+		}
+		JSONObject info = SoundRecorder.getStatus();
+		responseBody = info.toString().getBytes();
+		httpExchange.sendResponseHeaders(200, responseBody.length);
+		httpExchange.getResponseBody().write(responseBody);
+		httpExchange.close();
 		
 	}
 

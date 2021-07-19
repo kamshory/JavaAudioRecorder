@@ -1,8 +1,10 @@
 package com.planetbiru;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.planetbiru.config.Config;
+import com.planetbiru.config.PropertyLoader;
 import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.web.ServerWebAdmin;
@@ -16,6 +18,9 @@ public class Application {
 	public static void main(String[] args)
 	{
 		WebUserAccount.load(Config.getUserSettingPath());
+		
+		PropertyLoader.load("/config/config.ini");
+		
 		server.start(80);
 		InetSocketAddress address = new InetSocketAddress(8080);
 		serverWS = new ServerWebSocketServerAdmin(address); 
@@ -44,7 +49,15 @@ public class Application {
 		return loaded;	
 	}
 	public static void restartService() {
-		// TODO Auto-generated method stub
+		if(serverWS != null)
+		{
+			try {
+				serverWS.stop();
+			} catch (IOException | InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+		serverWS = null;
 		
 	}
 }

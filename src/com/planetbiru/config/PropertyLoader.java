@@ -49,6 +49,7 @@ public class PropertyLoader {
 		} 
 		catch (FileNotFoundException | JSONException e) 
 		{
+			e.printStackTrace();
 			/**
 			 * Do nothing
 			 */
