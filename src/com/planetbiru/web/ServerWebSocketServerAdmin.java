@@ -42,14 +42,9 @@ public class ServerWebSocketServerAdmin extends WebSocketServer{
 	public void onOpen(WebSocket conn, ClientHandshake request) {
 		
 		String rawCookie = request.getFieldValue("Cookie");
-		System.out.println("WebSocket");
-		System.out.println("rawCookie : "+rawCookie);
-		CookieServer cookie = new CookieServer(rawCookie);
-		cookie = new CookieServer(rawCookie, Config.getSessionName(), Config.getSessionLifetime());
+		CookieServer cookie = new CookieServer(rawCookie, Config.getSessionName(), Config.getSessionLifetime());
 		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
 		String password = cookie.getSessionData().optString(JsonKey.PASSWORD, "");
-		System.out.println("username : "+username);
-		System.out.println("password : "+password);
 		try 
 		{
 			if(WebUserAccount.checkUserAuth(username, password))

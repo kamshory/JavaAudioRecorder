@@ -140,8 +140,6 @@ public class CookieServer {
 	}
 	private void parseCookie(List<String> rawCookies)
 	{
-		System.out.println("Web");
-		System.out.println("rawCookie : "+rawCookies);
 		URLCodec urlCodec = new URLCodec();
 		Map<String, CookieItem> list = new HashMap<>();
 		if(rawCookies != null)

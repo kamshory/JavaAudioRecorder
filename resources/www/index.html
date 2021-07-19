@@ -12,6 +12,7 @@
     <script src="lib.assets/js/ie10-viewport-bug-workaround.js"></script>    
     <script src="lib.assets/js/jquery.min.js"></script>
     <script src="lib.assets/js/bootstrap.js"></script>
+    <script src="lib.assets/js/functions.js"></script>
     <script src="lib.assets/js/ws.min.js"></script>
     <link rel="stylesheet" href="lib.assets/css/filemanager.css">
     <title>Audio Recordning</title>
@@ -173,7 +174,7 @@
             display: inline-block; 
             vertical-align: top;     
             text-align: center;
-            padding-top: 14px;     
+            padding-top: 10px;     
         }
         .toolbar{
             float: left;
@@ -223,10 +224,7 @@
                     Menu
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="setting.html">Preference</a></li>
-                    <li><a class="dropdown-item" href="account.html">Account</a></li>
-                    <li><a class="dropdown-item" href="admin.html">Administrator</a></li>
-                    <li><a class="dropdown-item" href="#logout.html">Logout</a></li>
+                    
                 </ul>
             </div>
         </div>
@@ -235,6 +233,7 @@
     </div>
         
         <script>
+            
             function displaySize(size)
             {
                 var ret = '';
@@ -335,6 +334,7 @@
                 $('.toolbar').attr('data-paused', isPaused?'true':'false');
             }
             $(document).ready(function(){
+                builDropDownMenu();
                 $.ajax({
                     type: 'POST',
                     url: 'audio/recording/status',
