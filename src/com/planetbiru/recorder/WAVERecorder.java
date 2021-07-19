@@ -1,6 +1,8 @@
 package com.planetbiru.recorder;
 
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
@@ -12,16 +14,91 @@ public class WAVERecorder extends Thread {
 
 	private AudioFormat audioFormat;
 	private String path;
-	public WAVERecorder(String path, AudioFormat audioFormat) {
+	private int bufferSize = 4096;
+	private boolean separateFile = false;
+	private String extension = ".wav";
+	public WAVERecorder(String path, AudioFormat audioFormat, int bufferSize, boolean separateFile) {
 		this.audioFormat = audioFormat;
 		this.path = path;
+		this.bufferSize = bufferSize;
+		this.separateFile = separateFile;
 	}
 
 	@Override
 	public void run()
 	{
-		File file = new File(this.path);
+		this.recordSingleFile();
+		if(this.separateFile)
+		{
+			separateFile();
+		}
+	}
+	private void separateFile() {
+		File fileInput = new File(this.path+this.extension);
 		
+		List<RandomAccessFile> output = new ArrayList<>();
+		try(
+				RandomAccessFile input = new RandomAccessFile(fileInput, "r")
+		)
+		{
+			
+			for(int i = 0; i<this.audioFormat.getChannels(); i++)
+			{
+				output.add(new RandomAccessFile(this.path+"-"+i+this.extension, "rw")); 
+			}
+			
+			int singleChannelSize = (int) (SoundRecorder.getDataSize() / this.audioFormat.getChannels());
+			for(int i = 0; i<this.audioFormat.getChannels(); i++)
+			{
+				writeString(output.get(i), "RIFF"); 
+			    writeInt(output.get(i), 36 + singleChannelSize); 
+			    writeString(output.get(i), "WAVE"); 
+			    writeString(output.get(i), "fmt "); 
+			    writeInt(output.get(i), 16); 
+			    writeShort(output.get(i), (short) 1); 
+			    writeShort(output.get(i), (short) 1); 
+			    writeInt(output.get(i), (int) audioFormat.getSampleRate()); 
+			    writeInt(output.get(i), (audioFormat.getSampleSizeInBits() * 1)); 
+			    writeShort(output.get(i), (short) (audioFormat.getSampleSizeInBits() * 1 / 8));
+			    writeShort(output.get(i), (short) audioFormat.getSampleSizeInBits()); 
+			    writeString(output.get(i), "data"); 
+			    writeInt(output.get(i), singleChannelSize); 
+			}
+			input.seek(44);
+			int bsize = audioFormat.getSampleSizeInBits() / 8;
+			byte[] buffer = new byte[bsize];
+			int countRead = (int) (SoundRecorder.getDataSize() * 8 / (this.audioFormat.getChannels() * audioFormat.getSampleSizeInBits()) );
+			for(int k = 0; k<countRead; k++)
+			{
+				for(int i = 0; i<this.audioFormat.getChannels(); i++)
+				{
+					input.read(buffer);
+					output.get(i).write(buffer);
+				}
+			}
+			for(int i = 0; i<this.audioFormat.getChannels(); i++)
+			{
+				if(output.get(i) != null)
+				{
+					output.get(i).close();
+				}
+			}
+		}
+		catch(IOException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		finally {
+			/**
+			 * Do nothing
+			 */
+		}
+	}
+
+	private void recordSingleFile() {
+		File file = new File(this.path+this.extension);		
 		TargetDataLine targetDataLine;
 		
 		try (
@@ -48,7 +125,7 @@ public class WAVERecorder extends Thread {
 			targetDataLine.open();
 			targetDataLine.start();
 			
-			byte[] byteToRead = new byte[256];
+			byte[] byteToRead = new byte[this.bufferSize];
 			
 			int flag;
 			int dataSize = 0;
@@ -79,8 +156,10 @@ public class WAVERecorder extends Thread {
 		{
 			e.printStackTrace();
 		}
-
+		
 	}
+
+	
 	private void writeInt(RandomAccessFile output, int value) throws IOException {
 		output.write(value >> 0);
 		output.write(value >> 8);

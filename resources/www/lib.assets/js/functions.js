@@ -287,11 +287,19 @@ function filterData(data, filterValue, filterByKey, attributeName)
     }
     return unsorted;
 }
-
+var samplingRate = 48000;
+var bitDepth = 16;
+var channel = 2;
+function initPreference()
+{
+    $('#samplingRate').val(samplingRate);
+    $('#bitDepth').val(bitDepth);
+    $('#channel').val(channel);
+}
 function builDropDownMenu()
 {
     $('.dropdown-menu').append('<li><a class="dropdown-item" href="./">Home</a></li>');
-    $('.dropdown-menu').append('<li><a class="dropdown-item" href="setting.html">Preference</a></li>');
+    $('.dropdown-menu').append('<li><a class="dropdown-item" href="javascript:;" data-toggle="modal" data-target="#modalPreference">Preference</a></li>');
     $('.dropdown-menu').append('<li><a class="dropdown-item" href="account.html">Account</a></li>');
     $('.dropdown-menu').append('<li><a class="dropdown-item" href="admin.html">Administrator</a></li>');
     $('.dropdown-menu').append('<li><a class="dropdown-item" href="logout.html">Logout</a></li>');

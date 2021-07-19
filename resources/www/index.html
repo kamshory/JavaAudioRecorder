@@ -19,186 +19,7 @@
 </head>
 <body>
     <style>
-        .toolbar{
-            margin: 0;
-            padding: 0;
-        }
-        .toolbar .tool{
-            display: inline-block;
-            position: relative;
-        }
-        .toolbar .tool a{
-            width: 40px;
-            height: 40px;
-            display: block;
-        }
-        .tool-record a::before{
-            content: "";
-            width: 24px;
-            height: 24px;
-            background-color: #ee0d0d;
-            border-radius: 50%;
-            left: calc(50% - 12px);
-            top: calc(50% - 12px);
-            position: absolute;
-
-        }
-        [data-recording="true"] .tool-record a::before, [data-recording="true"] .tool-record a::after{
-            opacity: 0.6;
-            filter: saturate(0.8);
-            animation-duration: 1s;
-            animation-name: slowfade;
-            animation-iteration-count: infinite;
-        }
-        @keyframes slowfade {
-            0% {
-                opacity: 0.6;
-                filter: saturate(0.8);
-            }
-
-            50% {
-                opacity: 0.2;
-                filter: saturate(0.3);
-            }
-            100% {
-                opacity: 0.6;
-                filter: saturate(0.8);
-            }
-        }
-        [data-recording="false"] .tool-record a::before, [data-recording="false"] .tool-record a::after{
-            opacity: 1;
-        }
-        .tool-pause[data-status="normal"] a::before{
-            content: "";
-            width: 10px;
-            height: 24px;
-            background-color:#514b4b;
-            left: calc(50% - 12px);
-            top: calc(50% - 12px);
-            position: absolute;
-
-        }
-        .tool-pause[data-status="normal"] a::after{
-            content: "";
-            width: 10px;
-            height: 24px;
-            background-color:#514b4b;
-            right: calc(50% - 12px);
-            top: calc(50% - 12px);
-            position: absolute;
-
-        }
-        .tool-pause[data-status="paused"] a::before{
-            content: "";
-            width: 8px;
-            height: 24px;
-            background-color:#514b4b;
-            left: calc(50% - 12px);
-            top: calc(50% - 12px);
-            position: absolute;
-
-        }
-        .tool-pause[data-status="paused"] a::after{
-            content: "";
-            width: 0; 
-            height: 0; 
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;         
-            border-left: 12px solid #514b4b;
-            right: calc(50% - 12px);
-            top: calc(50% - 12px);
-            position: absolute;
-
-        }
-        [data-recording="true"] .tool-pause a::before, 
-        [data-recording="true"] .tool-pause a::after{
-            opacity: 1;
-        } 
-        [data-recording="false"] .tool-pause a::before, 
-        [data-recording="false"] .tool-pause a::after{
-            opacity: 0.6;
-        } 
         
-        .tool-stop a::before{
-            content: "";
-            width: 24px;
-            height: 24px;
-            background-color: #514b4b;
-            left: calc(50% - 12px);
-            top: calc(50% - 12px);
-            position: absolute;
-
-        }
-        [data-recording="true"] .tool-stop a::before{
-            opacity: 1;
-        } 
-        [data-recording="false"] .tool-stop a::before{
-            opacity: 0.6;
-            filter: saturate(0.8);
-        } 
-
-        .tool-play a::after{
-            content: "";
-            width: 0; 
-            height: 0; 
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;         
-            border-left: 18px solid #514b4b;
-            left: calc(50% - 9px);
-            top: calc(50% - 12px);
-            position: absolute;
-
-        }
-        
-        .float-right{
-            float:right;
-        }
-        .float-right .dropdown-menu{
-            right: 0 !important; 
-            left: auto !important;
-        }
-        .statusbar{
-            height: 48px;
-            display: inline-block;
-        }
-        .recording-status{
-            display: block;
-            position: relative;
-        }
-        .recording-status-wrapper{
-            display: block;
-        }
-        .recording-status-wrapper > div{
-            height: 48px;
-            width: 70px;
-            display: inline-block; 
-            vertical-align: top;     
-            text-align: center;
-            padding-top: 10px;     
-        }
-        .toolbar{
-            float: left;
-            margin-right: 10px;
-        }
-        .header{
-            display: flex;
-            flex-flow: row wrap;
-            position: relative;
-        }
-        .header .toolbar-wrapper{
-            width: calc(100% - 50px);
-
-        }
-        .header .dropdown-wrapper{
-            width: 40px; 
-            position: absolute; 
-            right: 0;
-            top: 12px;
-        }
-        .dropdown-menu{
-            left: auto;
-            right: 0;
-        }
 
     </style>
     <div class="contaoner">
@@ -335,6 +156,7 @@
             }
             $(document).ready(function(){
                 builDropDownMenu();
+                initPreference();
                 $.ajax({
                     type: 'POST',
                     url: 'audio/recording/status',
@@ -458,5 +280,59 @@
         </div>
         <script src="lib.assets/js/filemanager.js"></script>
     </div>
+
+
+
+    <div class="modal fade" id="modalPreference" tabindex="-1" role="dialog" aria-labelledby="modalPreference" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalPreferenceLabel">Preference</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <form action="admin.html" method="post">
+                    <table class="config-table config-table-connection">
+                        <tbody>
+                            <tr>
+                            <td>Sampling Rate</td>
+                            <td><select name="samplingRate" id="samplingRate">
+                                <option value="16000">16 kHz</option>
+                                <option value="22050">22.05 kHz</option>
+                                <option value="32000">32 kHz</option>
+                                <option value="44100">44.1 kHz</option>
+                                <option value="48000">48 kHz</option>
+                                <option value="96000">96 kHz</option>
+                                <option value="192000">192 kHz</option>
+                                </select></td>
+                            </tr>
+                            <tr>
+                                <td>Bit Depth</td>
+                                <td><select name="bitDepth" id="bitDepth">
+                                    <option value="8">8 bit</option>
+                                    <option value="16">16 bit</option>
+                                </select></td>
+                            </tr>
+                            <tr>
+                                <td>Channel</td>
+                                <td><select name="channel" id="channel">
+                                    <option value="1">Mono</option>
+                                    <option value="2">Stereo</option>
+                                </select></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>    
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
 </body>
 </html>

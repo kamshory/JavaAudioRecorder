@@ -21,11 +21,13 @@ public class HandlerWebManagerAudio implements HttpHandler {
 		if(path.contains("audio/recording/start"))
 		{
 			System.out.println("Start recording");
-			String audioPath = Config.getRecordingPath() + "/" + Utility.now("yyyy-MM-dd-HH-mm-ss")+".wav";
+			String audioPath = Config.getRecordingPath() + "/" + Utility.now("yyyy-MM-dd-HH-mm-ss");
 			int sampleRate = 48000;
 			short bitDepth = 16;
 			short channel = 2;
-			SoundRecorder.startRecording(audioPath, sampleRate, bitDepth, channel);
+			int bufferSize = 4096;
+			boolean splitFile = true;
+			SoundRecorder.startRecording(audioPath, sampleRate, bitDepth, channel, bufferSize, splitFile);
 			
 		}
 		else if(path.contains("audio/recording/stop"))

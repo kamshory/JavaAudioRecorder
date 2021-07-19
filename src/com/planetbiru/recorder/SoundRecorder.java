@@ -17,12 +17,14 @@ public class SoundRecorder {
 	private static short bitDepth;
 	private static short channel;
 	private static int frameSize;
+	private static int bufferSize = 4096;
+	private static boolean separateFile = false;
 
 	private SoundRecorder()
 	{
 		
 	}
-	public static void startRecording(String path, int sampleRate, short bitDepth, short channel)
+	public static void startRecording(String path, int sampleRate, short bitDepth, short channel, int bufferSize, boolean separateFile)
 	{
 		paused = false;			
 		if(!recording)
@@ -33,13 +35,15 @@ public class SoundRecorder {
 			SoundRecorder.bitDepth = bitDepth;
 			SoundRecorder.channel = channel;
 			SoundRecorder.frameSize = frameSize;
+			SoundRecorder.bufferSize = bufferSize;
+			SoundRecorder.separateFile = separateFile;
 			
 			dataSize = 0;
 			broadcaster = new Broadcaster(); 
 			Encoding audioFormatEncoding = Encoding.PCM_SIGNED;
 			boolean bigEndian = true;
 			AudioFormat audioFormat = new AudioFormat(audioFormatEncoding, sampleRate, bitDepth, channel, frameSize, sampleRate, bigEndian);
-			recorder = new WAVERecorder(path, audioFormat);
+			recorder = new WAVERecorder(path, audioFormat, bufferSize, separateFile);
 			recorder.start();
 			broadcaster.start();
 		}
